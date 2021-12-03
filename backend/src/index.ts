@@ -1,22 +1,22 @@
 import express from "express";
 import cors from "cors";
-//import path from "path";
+import path from "path";
 
-import admin from 'firebase-admin';
+import {db, auth} from './firebase-config';
 
 // require the service account: note the file path
-const serviceAccount = require('../service-account.json');
+// const serviceAccount = require('../service-account.json');
 // initialize the firebase app
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+// });
 
-const db = admin.firestore();
+// const db = admin.firestore();
 
 
 const app = express();
 app.use(cors());
-//app.use(express.static(path.join(__dirname, "../../frontend/build")));
+app.use(express.static(path.join(__dirname, "../../frontend/build")));
 app.use(express.json());
 
 const port = process.env.PORT || 8080;
@@ -45,7 +45,7 @@ app.get('/getEvents', async (_, res) => {
     res.send(events);
 });
 
-app.get('/getEventsByAccountId', async (req, res) => {
+app.post('/retrieveEventsByAccountId', async (req, res) => {
     const postsEvents = await eventCollection.orderBy('name', 'asc').get();
     const allPostsEventsDocs = postsEvents.docs;
     const events: EventWithID[] = [];
@@ -62,7 +62,10 @@ app.get('/getEventsByAccountId', async (req, res) => {
 
 
 app.post("/createEvent", async (req, res) => {
+    const idToken = req.headers.authorization || "";
     try {
+      const user = await auth.verifyIdToken(idToken);
+      if(user.email !== "rayyu0411@gmail.com") throw new Error();
       const newEvent = req.body as Event;
       const addedEvent = await eventCollection.add(newEvent);
       res.send(addedEvent.id);
@@ -72,9 +75,10 @@ app.post("/createEvent", async (req, res) => {
   });
 
 app.post("/updateEvent", async (req, res) => {
-    const { id, name } = req.body;
+    const { id, name, finished } = req.body;
     try{
         await eventCollection.doc(id as string).update({ name });
+        await eventCollection.doc(id as string).update({ finished });
         res.send("Event updated!");
     } catch (error){
         res.send("update error");

@@ -1,0 +1,7 @@
+{
+  "name": "Event-Management-Tool",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/yukeyang32/Event-Management-Tool.git",
+  "license": "MIT"
+}
