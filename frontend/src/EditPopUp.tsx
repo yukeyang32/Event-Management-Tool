@@ -5,7 +5,7 @@ type Props = {
     readonly toggle: () => void;
     readonly name : String;
     readonly finished: boolean;
-    readonly idx: Number;
+    readonly idx: String;
 
 }
 
@@ -16,19 +16,21 @@ function EditPopUp({toggle, name,idx, finished}:Props) {
     }
 
     const updateEvent = async () => {
-      const newEvent = {"Name":updateName,"id":idx, "finished": finished };
-      getAuth()
-        .currentUser?.getIdToken().
-          then((idToken)=>
+      const newEvent = {"name":updateName,"id":idx };
+      // getAuth()
+      //   .currentUser?.getIdToken().
+      //     then((idToken)=>
             fetch("/updateEvent",{
               method:"POST",
               headers: {
                 "content-type": "application/json",
-                "authorization": idToken,
+                // "authorization": idToken,
               },
               body: JSON.stringify(newEvent),
-            }).then((res) => res.text())            
-        )
+            }).then((res) => {
+              res.text();
+            })            
+        // )
     };
 
 
@@ -45,7 +47,7 @@ function EditPopUp({toggle, name,idx, finished}:Props) {
                 <input type="text" name="name" onChange = {(e) => setUpdateName(e.target.value)}/>
               </label>
               <br />
-              <input type="submit" onClick = {updateEvent}/>
+              <input type="submit" onClick ={updateEvent}/>
             </form>
           </div>
         </div>

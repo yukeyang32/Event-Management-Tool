@@ -6,12 +6,12 @@ import { Dropdown, DropdownProps } from "semantic-ui-react";
 //     readonly handleCheckChange: (e: ChangeEvent<HTMLInputElement>) => void;
 // };
 
-export type eventData = { readonly name: string; finished: boolean; readonly date: Date; readonly idx:number};
+export type eventData = { readonly name: string; finished: boolean; readonly date: Date; readonly id:String};
 export type optionData = { readonly key: number; readonly text: string; readonly value: number};
 
-// function editClick() {
+function editClick() {
 
-// }
+}
 // function deleteClick() {
     
 // }
@@ -25,7 +25,7 @@ const EventList = () => {
     
     const swapDate = function (chosendate: Date): void {
         console.log(chosendate.toString());
-        let newShownEvent = eventList.filter(({ name, finished, date, idx }) => {
+        let newShownEvent = eventList.filter(({ name, finished, date, id }) => {
             return chosendate === date;
         });
         setShownEventList(newShownEvent);
@@ -86,17 +86,20 @@ const EventList = () => {
           options={convertDatesToOptions(dateList)}
           selection
         />
-        {shownEventList.length === 0 ? "No Event" : shownEventList.map((item: eventData) => (
+        {eventList.length === 0 ? "No Event" : eventList.map((item: eventData) => (
                 
-                <div key = {String(item.idx)}>
+                <div key = {String(item.id)}>
                    <p> 
                     <label>
                         <input
                         type="checkbox"
-                        value={String(item.idx)}
+                        value={String(item.id)}
                         checked={item.finished} />
                         {item.name}
                     </label>
+
+                    <button onClick={editToggle}> Edit </button>
+                    {showToggleEdit ? <EditPopUp toggle = {editToggle} name={item.name} idx = {item.id} finished = {item.finished}/> : null}
                     
                     {/* <button onClick={editClick}>Edit</button>
                     {showToggleEdit ? <EditPopUp toggle = {editToggle} name={item.name}/> : null}

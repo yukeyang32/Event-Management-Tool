@@ -30,7 +30,7 @@ function AddPopUp({updateEventList}:Props) {
             .then((res) => res.text())
             .then((data) => {
                 // newEvent.date = new Date(newEvent.date);
-                const newEventWithID = {...newEvent, idx: Number(data), finished : false, date: new Date(newEvent.date)};
+                const newEventWithID = {...newEvent, id: data, finished : false, date: new Date(newEvent.date)};
                 updateEvents(newEventWithID);
             })
     };

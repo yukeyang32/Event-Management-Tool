@@ -75,10 +75,10 @@ app.post("/createEvent", async (req, res) => {
   });
 
 app.post("/updateEvent", async (req, res) => {
-    const { id, name, finished } = req.body;
+    const { id, name } = req.body;
     try{
         await eventCollection.doc(id as string).update({ name });
-        await eventCollection.doc(id as string).update({ finished });
+        //await eventCollection.doc(id as string).update({ finished });
         res.send("Event updated!");
     } catch (error){
         res.send("update error");
