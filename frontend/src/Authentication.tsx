@@ -25,9 +25,10 @@ const firebaseConfig = {
   
   type Props = {
     readonly children: React.ReactNode;
+    readonly handleUserID: (user_id:User|null) => void;
   };
   
-  const Authentication = ({ children }: Props) => {
+  const Authentication = ({ children, handleUserID }: Props) => {
     const [user, setUser] = useState<User | null>(null);
   
     const uiConfig = {
@@ -35,7 +36,12 @@ const firebaseConfig = {
       signInOptions: [GoogleAuthProvider.PROVIDER_ID],
     };
   
-    useEffect(() => onAuthStateChanged(auth, setUser), []);
+    useEffect(() => {
+      onAuthStateChanged(auth, setUser)
+      handleUserID(user);
+    }, [user]);
+
+    //https://firebase.google.com/docs/reference/js/v8/firebase.auth.Auth#onauthstatechanged
   
     return (
       <>

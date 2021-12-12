@@ -1,10 +1,13 @@
 import React,{useState, ChangeEvent, useEffect} from "react";
 import EditPopUp from './EditPopUp';
 import { Dropdown, DropdownProps } from "semantic-ui-react";
-// type Props = {
-//     readonly requestDate: Date;
-//     readonly handleCheckChange: (e: ChangeEvent<HTMLInputElement>) => void;
-// };
+import FirebaseAuth from 'react-firebaseui/FirebaseAuth';
+import AddPopUp from "./AddPopUp";
+
+
+type Props = {
+    readonly userID: string;
+};
 
 export type eventData = { readonly name: string; finished: boolean; readonly date: Date; readonly id:String};
 export type optionData = { readonly key: number; readonly text: string; readonly value: number};
@@ -12,21 +15,19 @@ export type optionData = { readonly key: number; readonly text: string; readonly
 function editClick() {
 
 }
-// function deleteClick() {
-    
-// }
 
 
-const EventList = () => {
+
+const EventList = ({userID} : Props) => {
     const [eventList, setEventList] = useState<eventData[]>([]);
     const [shownEventList, setShownEventList] = useState<eventData[]>([]);
     const [showToggleEdit, setShowToggleEdit] = useState(false);
+    const [showToggleAdd, setShowToggleAdd] = useState(false);
     const [dateList, setDateList] = useState<Date[]>([]);
     
-    const swapDate = function (chosendate: Date): void {
-        console.log(chosendate.toString());
+    const swapDate = function (chosendate: any): void {
         let newShownEvent = eventList.filter(({ name, finished, date, id }) => {
-            return chosendate === date;
+            return chosendate.innerText === date.toLocaleString();
         });
         setShownEventList(newShownEvent);
     };
@@ -37,7 +38,7 @@ const EventList = () => {
             res.push({
                 key: index,
                 text: date.toLocaleString(),
-                value: Number(date.toLocaleString())
+                value: index
             });
         });
         return res;
@@ -48,7 +49,7 @@ const EventList = () => {
         const requstOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({accountId: '1'}) // change userId
+            body: JSON.stringify({'accountId': userID}) // change userId
         };
         fetch("/retrieveEventsByAccountId", requstOptions)
             .then((res) => res.json())
@@ -66,7 +67,7 @@ const EventList = () => {
                 });
                 setDateList(newDateList);
             });
-    }, []);
+    }, [userID]);
      
     
 
@@ -75,18 +76,29 @@ const EventList = () => {
         setShowToggleEdit(!showToggleEdit);
     }
 
+    const addToggle = () => {
+        setShowToggleAdd(!showToggleAdd);
+    }
+
+    const addNewEvent = (newEvent:eventData) =>{
+        setEventList([...eventList, newEvent])
+    }
+
     return (
         <div>
         <Dropdown 
           placeholder="Select a date"
           onChange={(event: React.SyntheticEvent<HTMLElement, Event>, data:DropdownProps) =>
-            swapDate(new Date((event.target as Element).id))
+            swapDate(event.target)
           }
           clearable
           options={convertDatesToOptions(dateList)}
           selection
         />
-        {eventList.length === 0 ? "No Event" : eventList.map((item: eventData) => (
+
+
+
+        {shownEventList.length === 0 ? "No Event" : shownEventList.map((item: eventData) => (
                 
                 <div key = {String(item.id)}>
                    <p> 
@@ -101,12 +113,13 @@ const EventList = () => {
                     <button onClick={editToggle}> Edit </button>
                     {showToggleEdit ? <EditPopUp toggle = {editToggle} name={item.name} idx = {item.id} finished = {item.finished}/> : null}
                     
-                    {/* <button onClick={editClick}>Edit</button>
-                    {showToggleEdit ? <EditPopUp toggle = {editToggle} name={item.name}/> : null}
-                    <button onClick={deleteClick}>Delete</button> */}
                     </p>
                 </div>
-                ))}
+        ))}
+
+
+        <button onClick={addToggle}> Add Event</button>
+        {showToggleAdd ? <AddPopUp updateEventList = {addNewEvent} userID = {userID}></AddPopUp> : null}
         
     </div>
     );

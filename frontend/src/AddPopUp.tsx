@@ -4,17 +4,18 @@ import { eventData } from "./EventList";
 
 type Props = {
     readonly updateEventList: (newEventWithID: eventData) => void;
+    readonly userID: string;
 }
 
-function AddPopUp({updateEventList}:Props) {
+function AddPopUp({updateEventList,userID}:Props) {
     const updateEvents = (newEventWithID:eventData) =>{
         updateEventList(newEventWithID);
     }
     const [name, setName] = useState("");
-    const [accountId, setAccountId] = useState("");
+    // const [accountId, setAccountId] = useState("");
     const [date, setDate] = useState(Date());
     const createEvent = async () => {
-        const newEvent = {"name":name, "accountId": accountId, "date": date};
+        const newEvent = {"name":name, "accountId": userID, "date": date};
         getAuth()
             .currentUser?.getIdToken()
             .then((idToken) =>
@@ -49,7 +50,7 @@ function AddPopUp({updateEventList}:Props) {
                 <input type="text" name="name" onChange = {(e) => setName(e.target.value)}/>
               </label>
               <br />
-              <h3>Please enter the event date:</h3>
+              <h3>Please enter the event date: (Instruction: yyyy/mm/dd)</h3>
               <label>
                 Date:
                 <input type="text" name="date" onChange = {(e) => setDate(e.target.value)}/>
